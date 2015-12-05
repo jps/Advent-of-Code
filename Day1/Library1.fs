@@ -59,3 +59,20 @@ type SantaDeliveryService() =
     static member WhatFloor (input:string) = 
         Array.fold (fun acc x -> acc + UpDown(x)) 0 (input.ToCharArray())
     
+    static member PositionOfFirstEnterBasementChar(input:string) = 
+        let positions = Array.fold (fun acc x -> (acc.Head + (UpDown(x))) :: acc) [0] (input.ToCharArray())
+        let index = List.rev positions |> List.findIndex (fun elm -> elm = -1) 
+        index 
+        //let floors = Array.fold (fun acc x -> acc + UpDown(x)) 0 (input.ToCharArray())
+        //let (floor, floors) = Array.fold (fun (offset,acc) x -> acc + UpDown(x)) 0 (0, input.ToCharArray())
+        //let points = floors |> List.rev
+        
+        (*
+        let (_, pointsRev) = List.fold (fun (offset, l) s -> (offset+20, new RadioButton(Text=s, Location = new Point(20, offset)::l, Width = 350) strings (0, [])
+        let points = pointsRev |> List.rev
+
+        //let floors = floorsRev |>  floors.rev(
+        //let (_, pointsRev) = List.fold (fun (offset, l) s -> (offset+20, new RadioButton(Text=s, Location = new Point(20, offset)::l, Width = 350) strings (0, [])
+        //let points = pointsRev |> List.rev
+        //let (_, pointsRev) = List.fold (fun (offset, l) s -> (offset+20, new RadioButton(Text=s, Location = new Point(20, offset)::l, Width = 350) strings (0, [])
+        //let points = pointsRev |> List.rev*)
