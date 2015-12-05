@@ -7,8 +7,6 @@ open FsCheck
 open NUnit.Framework
 open Swensen.Unquote
 open Day1
-
-
 [<TestCase("(())",0)>]
 [<TestCase("()()",0)>]
 [<TestCase("(((",3)>]

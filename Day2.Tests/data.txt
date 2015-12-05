@@ -1,55 +1,4 @@
-﻿namespace Day2
-open System
-open System.IO
-
-(*
---- Day 2: I Was Told There Would Be No Math ---
-
-The elves are running low on wrapping paper, and so they need to submit an order for more. They have a list of the 
-dimensions (length l, width w, and height h) of each present, and only want to order exactly as much as they need.
-
-Fortunately, every present is a box (a perfect right rectangular prism), which makes calculating the required wrapping 
-paper for each gift a little easier: find the surface area of the box, which is 2*l*w + 2*w*h + 2*h*l. The elves also 
-need a little extra paper for each present: the area of the smallest side.
-
-For example:
-
-    A present with dimensions 2x3x4 requires 2*6 + 2*12 + 2*8 = 52 square feet of wrapping paper plus 6 square feet of slack, for a total of 58 square feet.
-    A present with dimensions 1x1x10 requires 2*1 + 2*10 + 2*10 = 42 square feet of wrapping paper plus 1 square foot of slack, for a total of 43 square feet.
-
-All numbers in the elves' list are in feet. How many total square feet of wrapping paper should they order?
-
-*)
-
-type Dimensions ={
-    Length : int;
-    Width: int;
-    Height: int; 
-}
-
-type Day2() = 
-    static member CaculateSurfaceAreaWithSlack(dimensions) = 
-        let sideA = dimensions.Length * dimensions.Width
-        let sideB = dimensions.Width * dimensions.Height 
-        let sideC = dimensions.Height * dimensions.Length
-        let sides = [sideA; sideB; sideC]
-        let smallestSide = List.min sides
-        let totalSurafaceArea = (List.sum sides) * 2
-        let areaWithSlack = smallestSide + totalSurafaceArea
-        areaWithSlack
-    static member LoadDimensionsFromFile(filePath) = 
-        let linesList = (System.IO.File.ReadLines(filePath)) |> List.ofSeq        
-        let dimensions = List.map (fun b -> 
-            let split = b.ToString().Split[|'x'|]
-            let splitConverted = Array.map(fun str -> Int32.Parse(str)) split
-            {   Length = (splitConverted.[0]);
-                Width = (splitConverted.[1]);
-                Height = (splitConverted.[2]) }) linesList
-        dimensions
-    static member CalculateTotalSurfaceAreaRequired dimensionsList = 
-        List.sumBy(fun d -> (Day2.CaculateSurfaceAreaWithSlack d)) dimensionsList
-(*
-20x3x11
+﻿20x3x11
 15x27x5
 6x29x7
 30x15x9
@@ -1049,4 +998,3 @@ type Day2() =
 29x4x8
 21x2x22
 14x12x8
-*)
