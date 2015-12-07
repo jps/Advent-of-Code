@@ -11,6 +11,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day2", "Day2\Day2.fsproj", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day2.Tests", "Day2.Tests\Day2.Tests.fsproj", "{137C0F62-704B-4776-969D-D1FAF495AED5}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day3", "Day3\Day3.fsproj", "{3A79E667-518A-429C-BFB5-DE2A0A51F135}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Day3.Tests", "Day3.Tests\Day3.Tests.fsproj", "{122CC420-DB69-44CE-8B10-41BAE8C10297}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{137C0F62-704B-4776-969D-D1FAF495AED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{137C0F62-704B-4776-969D-D1FAF495AED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{137C0F62-704B-4776-969D-D1FAF495AED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A79E667-518A-429C-BFB5-DE2A0A51F135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A79E667-518A-429C-BFB5-DE2A0A51F135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A79E667-518A-429C-BFB5-DE2A0A51F135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A79E667-518A-429C-BFB5-DE2A0A51F135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{122CC420-DB69-44CE-8B10-41BAE8C10297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{122CC420-DB69-44CE-8B10-41BAE8C10297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{122CC420-DB69-44CE-8B10-41BAE8C10297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{122CC420-DB69-44CE-8B10-41BAE8C10297}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
