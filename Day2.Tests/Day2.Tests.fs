@@ -36,3 +36,21 @@ let Can_CalculateTotalSurfaceAreaRequired() =
     let expected = 1606483
     let actual = Day2.CalculateTotalSurfaceAreaRequired (Day2.LoadDimensionsFromFile(filePath))
     Check.QuickThrowOnFailure (expected = actual |@ sprintf "expected %i actual %i" expected actual)
+
+[<Test>]
+let Can_CaculateSmallestFaceWithSlack_1() =
+    let expected = 34
+    let actual = Day2.CaculateSmallestFaceWithSlack(testDimension1)
+    Check.QuickThrowOnFailure (expected = actual |@ sprintf "%i = %i" expected actual)
+
+[<Test>]
+let Can_CaculateSmallestFaceWithSlack_2() =
+    let expected = 14
+    let actual = Day2.CaculateSmallestFaceWithSlack(testDimension2)
+    Check.QuickThrowOnFailure (expected = actual |@ sprintf "%i = %i" expected actual)
+
+[<Test>]
+let Can_CalculateTotalLengthRequired() =
+    let expected = 3842356
+    let actual = Day2.CalculateTotalLengthRequired (Day2.LoadDimensionsFromFile(filePath))
+    Check.QuickThrowOnFailure (expected = actual |@ sprintf "expected %i actual %i" expected actual)
