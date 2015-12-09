@@ -1,5 +1,5 @@
 ﻿namespace Day3
-
+open System
 (*--- Day 3: Perfectly Spherical Houses in a Vacuum ---
 
 Santa is delivering presents to an infinite two-dimensional grid of houses.
@@ -18,6 +18,33 @@ For example:
     ^v^v^v^v^v delivers a bunch of presents to some very lucky children at only 2 houses.
 *)
 
+type Movement =
+    | Up = '^'
+    | Right = 'V'
+    | Down = '>'
+    | Left = '<' 
 
-type Class1() = 
+type Mover() = 
+    let (|Up|Down|Left|Right|) direction =
+            match direction with
+                | '^' -> Up
+                | '>' -> Right
+                | 'V' -> Down
+                | '<' -> Left
+    let mutable x = 0
+    let mutable y = 0
+    static let initVisited = [(0, 1)] 
+    member this.Move (currentMoves: (int * int) list) movement = 
+        let (lastx,lasty) = currentMoves.Head
+        let current = match movement with
+                        | Up ->     (lastx, lasty + 1)
+                        | Right ->  (lastx + 1, lasty)
+                        | Down ->   (lastx, lasty - 1)
+                        | Left ->   (lastx - 1,lasty)
+        current :: currentMoves
+    member this.blah () =
+        let posix = this.Move initVisited '>'
+        ()
+
     member this.X = "F#"
+    

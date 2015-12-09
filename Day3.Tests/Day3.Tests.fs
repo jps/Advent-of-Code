@@ -14,6 +14,11 @@ open Swensen.Unquote
 // Note on FsCheck tests: The NUnit test runner will still green-light failing tests with Check.Quick 
 // even though it reports them as failing. Use Check.QuickThrowOnFailure instead.
 
+
+
+
 [<Test>]
-let ``FsCheck test 1``() =
+let Mover_Move_Should_Move_Up() =
+    let mover = new Mover()
+    let mover
     Check.QuickThrowOnFailure (true = false |@ sprintf "true = false")
