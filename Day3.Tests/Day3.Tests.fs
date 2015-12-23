@@ -45,3 +45,33 @@ let Mover_Test_Distinct_Question_1 () =
     let distinctList = Seq.distinct positionList
     let actualDistinct = Seq.length distinctList
     Check.QuickThrowOnFailure (actualDistinct = expectedDistinct |@ sprintf "there should be %i distinct cells got %i" expectedDistinct actualDistinct)
+
+[<Test>]
+let WorkLoadBalancer_Test_Split() =
+    let sampleString = "abcdefghij"
+    let expectedLength = sampleString.Length / 2
+
+    let directionStringA =  WorkLoadBalancer.everyNth 2 0 sampleString |> System.String.Concat // |> Seq.concat
+    let directionStringB =  WorkLoadBalancer.everyNth 2 1 sampleString |> System.String.Concat
+
+    Check.QuickThrowOnFailure (directionStringA.Length = expectedLength |@ sprintf "a: length should be %i got %i" directionStringA.Length expectedLength)
+    Check.QuickThrowOnFailure (directionStringB.Length = expectedLength |@ sprintf "b: length should be %i got %i" directionStringB.Length expectedLength)
+
+[<Test>]
+let Mover_Test_Distinct_Question_2 () =
+    let expectedDistinct = 2639
+    
+    let directionStringAll = System.IO.File.ReadAllText("data.txt")
+    let directionStringA =  WorkLoadBalancer.everyNth 2 0 directionStringAll |> System.String.Concat
+    let directionStringB =  WorkLoadBalancer.everyNth 2 1 directionStringAll |> System.String.Concat
+
+    let positionListA = Mover.MoveMany directionStringA
+    let positionListB = Mover.MoveMany directionStringB
+
+    let Combined = List.concat[positionListA; positionListB]
+
+    let distinctList = Seq.distinct Combined
+    let actualDistinct = Seq.length distinctList
+
+    Check.QuickThrowOnFailure (actualDistinct = expectedDistinct |@ sprintf "there should be %i distinct cells got %i" expectedDistinct actualDistinct)
+
