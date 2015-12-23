@@ -9,16 +9,39 @@ open FsCheck
 open NUnit.Framework
 open Swensen.Unquote
 
-// all tests are failing
+[<TestCase('^', 0, 1)>]
+[<TestCase('>', 1, 0)>]
+[<TestCase('V', 0, -1)>]
+[<TestCase('<', -1, 0)>]
+let Mover_Test_Single_Direction directionChar expectedX expectedY =
+    let expectedListLength = 2;     
+    let positionList = Mover.Move (Mover.initPosition()) directionChar        
+    Check.QuickThrowOnFailure (positionList.Length = expectedListLength |@ sprintf "move %c" directionChar)
+    Check.QuickThrowOnFailure (positionList.Head.X = expectedX |@ sprintf "move once %c should be %i" directionChar expectedX)
+    Check.QuickThrowOnFailure (positionList.Head.Y = expectedY |@ sprintf "move once %c should be %i" directionChar expectedY)
 
-// Note on FsCheck tests: The NUnit test runner will still green-light failing tests with Check.Quick 
-// even though it reports them as failing. Use Check.QuickThrowOnFailure instead.
+[<TestCase("^>V<", 0, 0)>]
+[<TestCase("^>v<", 0, 0)>]
+[<TestCase("^v^v^v^v^v", 0, 0)>]
+let Mover_Test_Multiple_Direction directionString expectedX expectedY =
+    let expectedListLength = (Seq.length directionString) |> (+) 1;     
+    let positionList = Mover.MoveMany directionString
+    Check.QuickThrowOnFailure (positionList.Length = expectedListLength |@ sprintf "move %s" directionString)
+    Check.QuickThrowOnFailure (positionList.Head.X = expectedX |@ sprintf "move many should be %i" expectedX)
+    Check.QuickThrowOnFailure (positionList.Head.Y = expectedY |@ sprintf "move many should be %i" expectedY)
 
-
-
-
+[<TestCase("^>V<", 4)>]
+let Mover_Test_Distinct directionString expectedDistinct =
+    let positionList = Mover.MoveMany directionString
+    let distinctList = Seq.distinct positionList
+    let actualDistinct = Seq.length distinctList
+    Check.QuickThrowOnFailure (actualDistinct = expectedDistinct |@ sprintf "there should be %i distinct cells" expectedDistinct)
+    
 [<Test>]
-let Mover_Move_Should_Move_Up() =
-    let mover = new Mover()
-    let mover
-    Check.QuickThrowOnFailure (true = false |@ sprintf "true = false")
+let Mover_Test_Distinct_Question_1 () =
+    let directionString = System.IO.File.ReadAllText("data.txt")
+    let expectedDistinct = 2565
+    let positionList = Mover.MoveMany directionString
+    let distinctList = Seq.distinct positionList
+    let actualDistinct = Seq.length distinctList
+    Check.QuickThrowOnFailure (actualDistinct = expectedDistinct |@ sprintf "there should be %i distinct cells got %i" expectedDistinct actualDistinct)

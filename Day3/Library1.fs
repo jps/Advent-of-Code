@@ -18,33 +18,46 @@ For example:
     ^v^v^v^v^v delivers a bunch of presents to some very lucky children at only 2 houses.
 *)
 
-type Movement =
-    | Up = '^'
-    | Right = 'V'
-    | Down = '>'
-    | Left = '<' 
 
-type Mover() = 
+module Mover =
+    type Position(x, y) = 
+        member this.X = x
+        member this.Y = y
+        override this.Equals(pos) =
+            match pos with
+            | :? Position as p -> (this.X = p.X && this.Y = p.Y)
+            | _ -> false
+        override this.GetHashCode() = hash (sprintf "x%iy%i"this.X this.Y)
+
+    let initPosition() = [Position(0, 0)] 
+
+    type Movement =
+        | Up = '^'
+        | Right = 'V'
+        | Down = '>'
+        | Left = '<' 
+
     let (|Up|Down|Left|Right|) direction =
-            match direction with
-                | '^' -> Up
-                | '>' -> Right
-                | 'V' -> Down
-                | '<' -> Left
-    let mutable x = 0
-    let mutable y = 0
-    static let initVisited = [(0, 1)] 
-    member this.Move (currentMoves: (int * int) list) movement = 
-        let (lastx,lasty) = currentMoves.Head
+                match direction with
+                    | '^' -> Up
+                    | '>' -> Right
+                    | 'V' | 'v' -> Down
+                    | '<' -> Left
+                    | _ -> Up
+        
+    let Move (currentMoves: Position list) movement = 
+        let lastPosition = currentMoves.Head
         let current = match movement with
-                        | Up ->     (lastx, lasty + 1)
-                        | Right ->  (lastx + 1, lasty)
-                        | Down ->   (lastx, lasty - 1)
-                        | Left ->   (lastx - 1,lasty)
+                        | Up ->     Position(lastPosition.X,     lastPosition.Y + 1)
+                        | Right ->  Position(lastPosition.X + 1, lastPosition.Y    )
+                        | Down ->   Position(lastPosition.X,     lastPosition.Y - 1)
+                        | Left ->   Position(lastPosition.X - 1, lastPosition.Y    )
         current :: currentMoves
-    member this.blah () =
-        let posix = this.Move initVisited '>'
-        ()
+    let MoveMany directionString =
+        Seq.fold (fun acc dirChar -> Move acc dirChar) (initPosition()) directionString
 
-    member this.X = "F#"
-    
+
+
+//    member this.blah () =
+//        let posix = this.Move initVisited '>'
+//        ()    
