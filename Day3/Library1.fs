@@ -77,8 +77,4 @@ module WorkLoadBalancer =
         seq |> Seq.mapi (fun i el -> el, i)              // Add index to element
             |> Seq.filter (fun (el, i) -> (i + offset) % n = n - 1) // Take every nth element
             |> Seq.map fst                               // Drop index from the result
-    
-
-//    member this.blah () =
-//        let posix = this.Move initVisited '>'
-//        ()    
+   
