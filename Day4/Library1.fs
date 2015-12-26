@@ -21,36 +21,23 @@ For example:
 *)
 
 module Miner = 
-    let expectedStart = "00000"
     let searchLowerBound = 0
-    let searchUpperBound = 1048990 //can be uped to infiity later
+    let searchUpperBound = Int32.MaxValue
 
     let GetMd5HashOfString (input:string) = 
         let hasher = MD5.Create() //should be passed so it can be reused
         let inputAsBytes = Encoding.UTF8.GetBytes(input)
         hasher.ComputeHash(inputAsBytes)
 
-    let Check (hash: byte[]) =        
-        let hashInHex = BitConverter.ToString(hash).Replace("-","");
-        hashInHex.StartsWith(expectedStart)        
+    let toHexString (hash: byte[]) =        
+        BitConverter.ToString(hash).Replace("-","");
 
-    let rec findFistMatchForKey (key:string, n:int) : int =
+    let rec findFistMatchForKey (key:string, startsWith:string, n:int) : int =
         match n with
         | x when x > searchUpperBound -> -1
         | _ -> let checkString = sprintf "%s%i"  key n
-               let hash = (GetMd5HashOfString checkString)
-               match Check hash with 
+               let hashAsHex = (GetMd5HashOfString checkString) |> toHexString 
+               let isMatch = hashAsHex.StartsWith(startsWith)        
+               match isMatch with 
                 | true -> n
-                | false -> findFistMatchForKey(key, n+1)
-
-//    let findFirstMatchForKey (key:string) =
-//        for i in searchLowerBound..searchUpperBound do
-//            let testStr = sprintf "%s%i"  key i
-//            let hash = (GetMd5HashOfString testStr)
-//            let isValid = Check hash
-//            match isValid with
-//            | true -> i
-//            | _ -> 0
-//            if isValid then
-//                (i : int)
-//        (0 : int)
+                | false -> findFistMatchForKey(key, startsWith, n+1)
