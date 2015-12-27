@@ -25,5 +25,26 @@ How many strings are nice?
 
 *)
 
-type Class1() = 
-    member this.X = "F#"
+type StringValidator() = 
+    let minVowelCount = 3
+    let vowels = ['a';'e';'i';'o';'u']
+    let badPairs = ["ab";"cd";"pd";"xy"]
+    let ContainsRequiredVowels (str:string) = 
+        str |> Seq.where(fun char -> vowels |> List.contains(char))
+            |> Seq.length >= minVowelCount
+    let ContainsAPair (str:string) = 
+        let chars = str.ToCharArray() |> Array.toList
+        let rec anyPair (arr:char List) =
+            match arr with
+            | a when a.Length = 1 -> false
+            | a when a.Head = a.Tail.Head -> true
+            | _ -> anyPair(arr.Tail)
+        anyPair chars
+    let ContainsBadPair (str:string) =
+       badPairs  |> List.exists(fun x -> str.Contains(x.ToString()))
+    member this.isStringValid (str:string) = 
+        match str with
+        | s when ContainsRequiredVowels s && ContainsAPair s && not(ContainsBadPair s) -> true
+        | _ -> false    
+
+
