@@ -48,3 +48,32 @@ type StringValidator() =
         | _ -> false    
 
 
+type StringValidator2() = 
+    let containsRepeatedPair (str:string) = 
+        let chars = str.ToCharArray() |> Array.toList
+        let rec repeatedPair (arr:char List) =
+            match arr with
+            | a when a.Length <= 3 -> false
+            | a when System.String.Concat(Array.ofList(a.Tail.Tail)).Contains(new string([|a.Head; a.Tail.Head|])) -> true
+            | _ -> repeatedPair(arr.Tail)
+        repeatedPair chars 
+    let anyTriples(str:string) = 
+            let chars = str.ToCharArray() |> Array.toList
+            let rec anyTrips (arr:char List) =
+                match arr with
+                | a when a.Length <= 2 -> false
+                | a when a.Head = a.Tail.Head && a.Head = a.Tail.Tail.Head -> true
+                | _ -> anyTrips arr.Tail
+            anyTrips chars
+    let containsSandwichedChar(str:string) = 
+            let chars = str.ToCharArray() |> Array.toList
+            let rec sandwitch (arr:char List) =
+                match arr with
+                | a when a.Tail.Length < 2 -> false
+                | a when a.Head = a.Tail.Tail.Head -> true
+                | _ -> sandwitch arr.Tail
+            sandwitch chars
+    member this.isStringValid (str:string) = 
+        match str with
+        | s when containsRepeatedPair s && not(anyTriples s) && containsSandwichedChar s -> true
+        | _ -> false    
