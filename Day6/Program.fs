@@ -1,7 +1,8 @@
 ﻿// Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
+namespace Day6
 
-
+open System
 (*
 --- Day 6: Probably a Fire Hazard ---
 
@@ -30,8 +31,52 @@ After following the instructions, how many lights are lit?
 
 
 *)
-
-[<EntryPoint>]
-let main argv = 
-    printfn "%A" argv
-    0 // return an integer exit code
+type Cord(x,y) = 
+    member this.X = x;
+    member this.Y = y
+type Cell = 
+    struct
+        val X: int
+        val Y: int
+        val IsOn: bool
+        new (x,y,isOn) = { X = x; Y = y; IsOn = isOn}
+    end
+ 
+module GridUpdater =
+    let maxX = 999
+    let maxY = 999
+    let cells = 1000000
+    let DefaultGrid () = 
+        (List.init cells (fun index -> new Cell(index % 1000, index / 1000, false)))
+//      this is sooo much slower
+//        [|for x in 0 .. maxX do
+//          for y in 0 .. maxY do 
+//                yield Cell( x, y, false) |]
+    let (|TurnOn|TurnOff|Toggle|) (input:string) = 
+        match input with
+        | i when i.Contains("turn on") -> TurnOn
+        | i when i.Contains("turn off") -> TurnOff
+        | _ -> Toggle
+    let getCordFromString (cordString:string) =
+        let cords = cordString.Split(',') |> Array.map(Int32.Parse)
+        Cord(cords.[0], cords.[1])
+    let GetCords (input:string) =
+        let redundantStrings = ["turn on";"turn off";"through";"toggle"]        
+        let cleaned = List.fold (fun (acc:string) (x:string) -> acc.Replace(x,"")) input redundantStrings 
+        let cordStrings = cleaned.Replace("  "," ").Trim().Split(' ')
+        (getCordFromString(cordStrings.[0]), getCordFromString(cordStrings.[1]))
+    let UpdateGrid (command:string) (grid: Cell list) = 
+        let (fromCords, toCords) = GetCords(command)
+        let action(command:string) (current:bool) = 
+            match command with
+            | TurnOn -> true
+            | TurnOff -> false
+            | Toggle -> not current       
+        let partiallyAppliedAction = action command
+        let updateCell (cell:Cell) = 
+            Cell(cell.X, cell.Y, partiallyAppliedAction(cell.IsOn))
+        let shouldUpdate (cell:Cell) = 
+            match cell with
+            | c when c.X >= fromCords.X && c.X <= toCords.X && c.Y >= fromCords.Y && c.Y <= toCords.Y -> updateCell(cell)
+            | _ -> cell
+        grid |> List.map shouldUpdate        
