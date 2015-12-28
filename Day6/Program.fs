@@ -29,6 +29,24 @@ For example:
 
 After following the instructions, how many lights are lit?
 
+--- Part Two ---
+
+You just finish implementing your winning light pattern when you realize you mistranslated Santa's message from Ancient Nordic Elvish.
+
+The light grid you bought actually has individual brightness controls; each light can have a brightness of zero or more. The lights all start at zero.
+
+The phrase turn on actually means that you should increase the brightness of those lights by 1.
+
+The phrase turn off actually means that you should decrease the brightness of those lights by 1, to a minimum of zero.
+
+The phrase toggle actually means that you should increase the brightness of those lights by 2.
+
+What is the total brightness of all lights combined after following Santa's instructions?
+
+For example:
+
+    turn on 0,0 through 0,0 would increase the total brightness by 1.
+    toggle 0,0 through 999,999 would increase the total brightness by 2000000.
 
 *)
 type Cord(x,y) = 
@@ -38,7 +56,7 @@ type Cell =
     struct
         val X: int
         val Y: int
-        val IsOn: bool
+        val IsOn: int
         new (x,y,isOn) = { X = x; Y = y; IsOn = isOn}
     end
  
@@ -47,7 +65,7 @@ module GridUpdater =
     let maxY = 999
     let cells = 1000000
     let DefaultGrid () = 
-        (List.init cells (fun index -> new Cell(index % 1000, index / 1000, false)))
+        (Array.init cells (fun index -> new Cell(index % 1000, index / 1000, 0)))
 //      this is sooo much slower
 //        [|for x in 0 .. maxX do
 //          for y in 0 .. maxY do 
@@ -65,13 +83,14 @@ module GridUpdater =
         let cleaned = List.fold (fun (acc:string) (x:string) -> acc.Replace(x,"")) input redundantStrings 
         let cordStrings = cleaned.Replace("  "," ").Trim().Split(' ')
         (getCordFromString(cordStrings.[0]), getCordFromString(cordStrings.[1]))
-    let UpdateGrid (command:string) (grid: Cell list) = 
+    let UpdateGrid (command:string) (grid: Cell[]) = 
         let (fromCords, toCords) = GetCords(command)
-        let action(command:string) (current:bool) = 
+        let action(command:string) (current:int) = 
             match command with
-            | TurnOn -> true
-            | TurnOff -> false
-            | Toggle -> not current       
+            | TurnOn -> current + 1
+            | TurnOff when current <= 0 -> 0 
+            | TurnOff -> current - 1 
+            | Toggle -> current + 2
         let partiallyAppliedAction = action command
         let updateCell (cell:Cell) = 
             Cell(cell.X, cell.Y, partiallyAppliedAction(cell.IsOn))
@@ -79,4 +98,4 @@ module GridUpdater =
             match cell with
             | c when c.X >= fromCords.X && c.X <= toCords.X && c.Y >= fromCords.Y && c.Y <= toCords.Y -> updateCell(cell)
             | _ -> cell
-        grid |> List.map shouldUpdate        
+        grid |> Array.map shouldUpdate        
