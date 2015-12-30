@@ -99,6 +99,15 @@ let Parser_Question_1_Simple() =
     Check.QuickThrowOnFailure (expected = actual|@ sprintf "%i != %i" expected actual)
     ()    
 
+[<Test>]
+let Parser_Question_2_Simple() =
+    let expected = 40149us
+    let parser = new Parser()    
+    let commands = (System.IO.File.ReadLines(filePath2)) |> parser.BuildCommandMap    
+    let value = parser.SimpleEvalCommands commands 
+    let actual = value.["a"]    
+    Check.QuickThrowOnFailure (expected = actual|@ sprintf "%i != %i" expected actual)
+    ()    
 
 
 //    let expectedDval = 72
