@@ -1,154 +1,108 @@
 ﻿module Day7.Tests
 
-// https://github.com/fsharp/FsCheck/blob/master/Docs/Documentation.md
-// https://github.com/fsharp/FsUnit
-// https://code.google.com/p/unquote/
-
+open Day7
+open System
 open FsUnit
 open FsCheck
 open NUnit.Framework
 open Swensen.Unquote
 
-// all tests are failing
-
-// Note on FsCheck tests: The NUnit test runner will still green-light failing tests with Check.Quick 
-// even though it reports them as failing. Use Check.QuickThrowOnFailure instead.
-
-[<Test>]
-let ``FsCheck test 1``() =
-    Check.QuickThrowOnFailure (true = false |@ sprintf "true = false")
-
-open NUnitRunner
-[<Test>]
-let ``FsCheck test 2 (string generator)``() =
-    let genString = 
-        gen {
-            let! a = Arb.generate<string>
-            return a
-        }
-   
-    let nUnitConfig = { Config.Default with Runner = nUnitRunner }
-
-//    Check.Verbose ("Arbitrary strings", nUnitConfig, (Prop.forAll ( Arb.fromGen genString )
-    Check.One ("Arbitrary strings", nUnitConfig, (Prop.forAll ( Arb.fromGen genString )
-                (fun myString -> 
-                    myString = myString + " "
-                    |> Prop.trivial (myString.Length  = 0)
-                    |> Prop.classify (myString.Length = 1) "length = 1"
-                    |> Prop.classify (myString.Length = 2) "length = 2"
-                    |> Prop.classify (myString.Length = 3) "length = 3"
-                    |> Prop.classify (myString.Length = 4) "length = 4"
-                    |> Prop.classify (myString.Length = 5) "length = 5"
-                    |> Prop.classify (myString.Length = 6) "length = 6" 
-                    |> Prop.classify (myString.Length = 7) "length = 7" 
-                    |> Prop.classify (myString.Length > 7) "length = 8 or GT" )))
-
-// types for FsCheck test 3 (registering an arbitrary type for generation)
-type EvenInt = EvenInt of int with
-    static member op_Explicit(EvenInt i) = i
-
-type ArbitraryModifiers =
-    static member EvenInt() = 
-        Arb.from<int> 
-        |> Arb.filter (fun i -> i % 2 = 0) 
-        |> Arb.convert EvenInt int
+let testDataPath = "testData.txt"
+let filePath = "data.txt"
+let filePath2 = "data2.txt"
 
 [<Test>]
-let ``FsCheck test 3 (registering an arbitrary type for generation)``() =
-    Arb.register<ArbitraryModifiers>() |> ignore
+let Parser_BuildCommandMap_Should_Build_Correct_Commands_For_Data() =
+    let parser = new Parser()    
+    let commands = (System.IO.File.ReadLines(filePath)) |> parser.BuildCommandMap  |> Map.toList    
+    
+    let TotalCount = commands |> List.length
+    let ValCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | VAL(x) -> true | _ -> false) |> List.length
+    let NotCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | NOT(x) -> true | _ -> false) |> List.length
+    let AndCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | AND(x,y) -> true | _ -> false) |> List.length
+    let VandCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | VAND(x,y) -> true | _ -> false) |> List.length
+    let OrCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | OR(x,y) -> true | _ -> false) |> List.length
+    let PointerCount = commands |> List.filter(fun (str,cmd) -> match cmd with  | POINTER(x) -> true | _ -> false) |> List.length
+    let LShift = commands |> List.filter(fun (str,cmd) -> match cmd with  | LSHIFT(x,y) -> true | _ -> false) |> List.length
+    let RShift = commands |> List.filter(fun (str,cmd)-> match cmd with  | RSHIFT(x,y) -> true | _ -> false) |> List.length
 
-    let ``generated even ints should be even`` (EvenInt i) = i % 2 = 1
-    Check.QuickThrowOnFailure ``generated even ints should be even``
+    let expectedTotalCount = 339
+    let expectedValCount = 2
+    let expectedNotCount = 48
+    let expectedAndCount = 96
+    let expectedVAndCount = 16
+    let expectedOrCount = 80
+    let expectedPointerCount = 1
+    let expectedLShiftCount = 32
+    let expectedRShiftCount = 64   
 
-[<Test>]
-let ``FsCheck test 4 (and properties)``() =
-    Check.QuickThrowOnFailure ((1 = 1) |@ sprintf "1 = 1" .&. (2 = 3) |@ sprintf "2 != 3")
+    Check.QuickThrowOnFailure (TotalCount = expectedTotalCount |@ sprintf "%i != %i" TotalCount expectedTotalCount)
+    Check.QuickThrowOnFailure (ValCount = expectedValCount |@ sprintf "%i != %i" ValCount expectedValCount)
+    Check.QuickThrowOnFailure (NotCount = expectedNotCount |@ sprintf "%i != %i" NotCount expectedNotCount)
+    Check.QuickThrowOnFailure (AndCount = expectedAndCount |@ sprintf "%i != %i" AndCount expectedAndCount)
+    Check.QuickThrowOnFailure (VandCount = expectedVAndCount |@ sprintf "%i != %i" VandCount expectedVAndCount)
+    Check.QuickThrowOnFailure (OrCount = expectedOrCount |@ sprintf "%i != %i" OrCount expectedOrCount)
+    Check.QuickThrowOnFailure (PointerCount = expectedPointerCount |@ sprintf "%i != %i" PointerCount expectedPointerCount)
+    Check.QuickThrowOnFailure (LShift = expectedLShiftCount |@ sprintf "%i != %i" LShift expectedLShiftCount)
+    Check.QuickThrowOnFailure (RShift = expectedRShiftCount |@ sprintf "%i != %i" RShift expectedRShiftCount)
+    ()
 
-[<Test>]
-let ``FsCheck test 5 (or properties)``() =
-    Check.QuickThrowOnFailure ((1 = 2) |@ sprintf "1 != 2" .|. (2 = 3) |@ sprintf "2 != 3")
-
-// type and spec for FsCheck test 6 (stateful testing)
-type Counter() =
-    let mutable n = 0
-    member x.Inc() = n <- n + 1
-    member x.Dec() = if n > 2 then n <- n - 2 else n <- n - 1
-    member x.Get = n
-    member x.Reset() = n <- 0
-    override x.ToString() = n.ToString()
-
-open FsCheck.Commands
-
-let spec =
-    let inc = 
-        { new ICommand<Counter, int>() with
-            member x.RunActual actual = actual.Inc(); actual
-            member x.RunModel model = model + 1
-            member x.Post (actual, model) = model = actual.Get |@ sprintf "model = %i, actual = %i" model actual.Get
-            override x.ToString() = "inc"}
-    let dec = 
-        { new ICommand<Counter, int>() with
-            member x.RunActual actual = actual.Dec(); actual
-            member x.RunModel model = model - 1
-            member x.Post (actual, model) = model = actual.Get |@ sprintf "model = %i, actual = %i" model actual.Get
-            override x.ToString() = "dec"}
-    { new ISpecification<Counter, int> with
-        member x.Initial() = (new Counter(), 0)
-        member x.GenCommand _ = Gen.elements [inc;dec] }
-
-[<Test>]
-let ``FsCheck test 6a (stateful testing spec)``() =
-    Check.QuickThrowOnFailure (asProperty spec)
-
-// type and spec for FsCheck test 6b (stateful testing command series)
-
-let inc2 = 
-    { new ICommand<Counter, int>() with
-        member x.RunActual actual = actual.Inc(); actual
-        member x.RunModel model = model + 1
-        member x.Post (actual, model) = model = actual.Get |@ sprintf "model = %i, actual = %i" model actual.Get
-        override x.ToString() = "inc"}
-let dec2 = 
-    { new ICommand<Counter, int>() with
-        member x.RunActual actual = actual.Dec(); actual
-        member x.RunModel model = model - 1
-        member x.Post (actual, model) = model = actual.Get |@ sprintf "model = %i, actual = %i" model actual.Get
-        override x.ToString() = "dec"}
-
-let reset = 
-    { new ICommand<Counter, int>() with
-        member x.RunActual actual = actual.Reset(); actual
-        member x.RunModel model = 0
-        member x.Post (actual, model) = model = actual.Get |@ sprintf "model = %i, actual = %i" model actual.Get
-        override x.ToString() = "reset"}
-
-let spec2 genList =
-    { new ISpecification<Counter, int> with
-        member x.Initial() = (new Counter(), 0)
-        member x.GenCommand _ = Gen.elements genList }
+[<TestCase("d",72us)>]
+[<TestCase("e",507us)>]
+[<TestCase("f",492us)>]
+[<TestCase("g",114us)>]
+[<TestCase("h",65412us)>]
+[<TestCase("i",65079us)>]
+[<TestCase("x",123us)>]
+[<TestCase("y",456us)>]
+[<TestCase("q",8us)>]
+[<TestCase("z",8us)>]
+let Parser_EvalCommands_Should_Build_Correct_Commands_For_Test_Data( key, expected  )=
+    let parser = new Parser()    
+    let commands = (System.IO.File.ReadLines(testDataPath)) |> parser.BuildCommandMap
+    let evaluatedCommands = parser.EvalCommands(commands)
+    let (_,actual) = evaluatedCommands.[key]
+    Check.QuickThrowOnFailure (actual = expected|@ sprintf "%i != %i" actual expected)
 
 
-[<Test>]
-let ``FsCheck test 6b (stateful testing command series)``() =
-    let ``inc, dec, reset`` = [inc2; dec2; reset]
-    Check.QuickThrowOnFailure (asProperty (spec2 ``inc, dec, reset``))
+//        | POINTER(pointTo) -> (EvalCommand map.[pointTo] map) 
+//        | NOT(applyTo) -> ~~~(EvalCommand map.[applyTo] map) //~~~16us
+//        | VAND(vala, b) -> vala &&& (EvalCommand map.[b] map)
+//        | AND(a, b) -> (EvalCommand map.[a] map) &&& (EvalCommand map.[b] map)//eval(map.[a],map) &&& eval(map.[b],map) &&&
+//        | OR(a, b) -> (EvalCommand map.[a] map) ||| (EvalCommand map.[b] map)
+//        | LSHIFT(applyTo, nBits) -> (EvalCommand map.[applyTo] map) <<< nBits//failwith "Not implemented yet" <<<
+//        | RSHIFT(applyTo, nBits) ->
+
+    
+    
+    ()
+    //Check.QuickThrowOnFailure (commands.["d"] = 72) // |@ sprintf "%i != %i" expectedDval  dval)
+
+
+//[<Test>] -- do not run will never complete... 
+//let Parser_Question_1() =
+//    let parser = new Parser()    
+//    let commands = (System.IO.File.ReadLines(filePath2)) |> parser.BuildCommandMap    
+//    let value = parser.EvalSingle "a" commands 
+//    let actualValue = value
+//    let expected = 45454us
+//    Check.QuickThrowOnFailure (actualValue = expected|@ sprintf "%i != %i" actualValue expected)
+//    ()    
 
 [<Test>]
-let ``FsUnit test 1``() =
-    [1; 2; 3] |> should equal [1; 2; 3; 4]
+let Parser_Question_1_Simple() =
+    let expected = 956us    
+    let parser = new Parser()    
+    let commands = (System.IO.File.ReadLines(filePath)) |> parser.BuildCommandMap    
+    let value = parser.SimpleEvalCommands commands 
+    let actual = value.["a"]    
+    Check.QuickThrowOnFailure (expected = actual|@ sprintf "%i != %i" expected actual)
+    ()    
 
-[<Test>]
-let ``FsUnit test 2``() =
-    1 |> should not' (equal 1)
 
-[<Test>]
-let ``FsUnit test 3``() =
-    10.1 |> should (equalWithin 0.1) 10.22
 
-[<Test>]
-let ``FsUnit test 4 (should throw exception)``() =
-    (fun () -> 1 + 2 |> ignore) |> should throw typeof<System.Exception>
-
-[<Test>]
-let ``Unquote test 1``() =
-    test <@ ([3; 2; 1; 0] |> List.map ((+) 1)) = [1 + 3..1 + 0] @>
+//    let expectedDval = 72
+//    
+//
+//    Check.QuickThrowOnFailure (expectedDval = dval  |@ sprintf "%i != %i" expectedDval  dval)
+    
