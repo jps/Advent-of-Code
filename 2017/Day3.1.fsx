@@ -3,10 +3,8 @@ let puzzleInput = 361527
 type Direction = Right | Up | Left | Down
 type SquareExpandsInto = DownRight | UpLeft
 
-let rec findSmallestPowerOfTwoNumerExistsWithin input current = 
-    match input with 
-        | i when i <= pown current 2 -> current
-        | _ -> findSmallestPowerOfTwoNumerExistsWithin input (current+1)
+let ShiftToNextPowerOfTwo input = 
+    (System.Math.Ceiling(System.Math.Log(input |> float)/System.Math.Log(2 |> float))) |> int
 
 let findMidPoint startPoint endPoint =     
     (System.Math.Ceiling(((startPoint - endPoint) |> float) / (2 |> float))) 
@@ -14,7 +12,7 @@ let findMidPoint startPoint endPoint =
                 |> (+)endPoint
 
 let findDistance input = 
-    let containingSquare = findSmallestPowerOfTwoNumerExistsWithin input 2
+    let containingSquare = ShiftToNextPowerOfTwo input
     let expandingInto = match containingSquare % 2 = 0 with
                         | true -> SquareExpandsInto.UpLeft
                         | false -> SquareExpandsInto.DownRight
@@ -24,6 +22,13 @@ let findDistance input =
     printfn "Last Power:%i Containing Power:%i" lastPower containgPower
 
     let corner = findMidPoint containgPower lastPower
+    
+    let direction = match (input < corner, expandingInto) with
+                                    | (true, UpLeft) -> Up
+                                    | (false, UpLeft) -> Left
+                                    | (true, DownRight) -> Down
+                                    | (false, DownRight) -> Right
+    printfn "Direction: %s" (direction |> string)
 
     let yMidPoint = (match expandingInto with
                         | DownRight -> findMidPoint (lastPower+1) corner
@@ -36,14 +41,6 @@ let findDistance input =
                      |> System.Math.Abs
 
     printfn "Corner:%i XMidPoint:%i YMidPoint:%i" corner xMidPoint yMidPoint
-
-    let direction = match (input < corner, expandingInto) with
-                                    | (true, UpLeft) -> Up
-                                    | (false, UpLeft) -> Left
-                                    | (true, DownRight) -> Down
-                                    | (false, DownRight) -> Right
-    
-    printfn "Direction: %s" (direction |> string)
 
     let distanceFromYMidPoint = match direction with
                                         | Up | Down -> ([input;yMidPoint] |> List.max) - ([input;yMidPoint] |> List.min)
