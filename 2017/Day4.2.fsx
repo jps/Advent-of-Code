@@ -1,13 +1,23 @@
+
+let stringToCharList input = 
+    [for c in input -> c]
+
+let charsToString listOfChars =
+    new System.String(listOfChars |> Array.ofList) 
+
 let IsPassPhraseValid (passphrase:string) = 
-    let words = passphrase.Split()
+    let words = passphrase.Split() 
+    let wordsAsOrderedCharList = words |> Array.map (stringToCharList >> List.sort)
     let originalCount = words.Length
-    let distinctCount = words |> Array.toSeq |> Seq.distinct |> Seq.length
+    let distinctCount = wordsAsOrderedCharList |> Array.toSeq |> Seq.distinct |> Seq.length
     originalCount = distinctCount
 
 let testCases = [
-    ("aa bb cc dd ee", true);
-    ("aa bb cc dd aa", false);
-    ("aa bb cc dd aaa", true)]
+    ("abcde fghij", true);
+    ("abcde xyz ecdab", false);
+    ("a ab abc abd abf abj", true)
+    ("iiii oiii ooii oooi oooo", true)
+    ("oiii ioii iioi iiio", false)]
 
 for (input, expected) in testCases do
             let result = IsPassPhraseValid(input)
