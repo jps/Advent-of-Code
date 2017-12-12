@@ -34,7 +34,7 @@ let rec memoryReallocation input (previousStates: string list)=
             //let lastOccurance = newStateList.Length-2
             let dupeString = newStateList.[newStateList.Length-2]
             let firstOccurance = previousStates |> List.findIndex (fun x -> x = dupeString)
-            let lastOccurance = previousStates |> List.findIndex (fun x -> x = dupeString)
+            let lastOccurance = previousStates |> List.findIndexBack (fun x -> x = dupeString)
             lastOccurance - firstOccurance
             //let distinct = (previousStates |> List.distinct)
             //let firstNonDistinct = previousStates |> List.findIndex (fun x -> previousStates |> List.(x))
@@ -58,11 +58,7 @@ let test (inputString:string) expected=
 
 let inputString = test "0 2 7 0" 4
 
-
-let a = set [0;1;2;3]
-let b = set [0;1;2;3;3]
-let c = b - a;;
-//let inputData = test "14 0 15 12 11 11 3 5 1 6 8 4 9 1 8 4" 1234
+let inputData = test "14 0 15 12 11 11 3 5 1 6 8 4 9 1 8 4" 1234
 // let getNextPosition currentPosition (inputArray:int[]) = 
 //     match (currentPosition, inputArray.Length) with
 //         | (p,l) when (p+1) = l -> 0
