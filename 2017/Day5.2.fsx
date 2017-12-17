@@ -1,6 +1,8 @@
 let getNextBoardState (input:int[]) position = 
     let nextState = Array.copy input
-    nextState.[position] <- nextState.[position]+1
+    nextState.[position] <- match nextState.[position] with
+                            | x when x >= 3 -> (x-1)
+                            | x -> (x+1)
     nextState
 
 let getNextPosition (input:int[]) position =
@@ -13,7 +15,7 @@ let rec runInstructionSet (input:int[]) position moveCount =
                 when position < 0 || position > arrayLength-1 -> moveCount
             | _ -> runInstructionSet (getNextBoardState input position) (getNextPosition input position) (moveCount+1)
 
-let testCases = [([|0; 3;  0;  1;  -3;|], 5); ]
+let testCases = [([|0; 3;  0;  1;  -3;|], 10); ]
 
 for (input, expected) in testCases do
             let result = runInstructionSet input 0 0
@@ -25,3 +27,5 @@ let useProvidedInputData =
     let moveCount = runInstructionSet instructionSet 0 0
     printfn "result:%i" moveCount
     ()
+
+useProvidedInputData
