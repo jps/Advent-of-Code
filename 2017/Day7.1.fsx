@@ -61,7 +61,6 @@ let useTestCase =
     ()                
 
 
-
 let useProvidedInputData =
     let inputFile = System.IO.File.ReadLines("Day7.input.txt")
     let instructionSet = inputFile |> Seq.toList
